@@ -35,7 +35,7 @@ local fuselage=part("Fuselage",Vector3.new(12,12,90),CFrame.new(0,30,0),Color3.f
 part("Wings",Vector3.new(110,2,18),CFrame.new(0,30,5),Color3.fromRGB(205,210,218),aircraft)
 part("Tailplane",Vector3.new(42,2,12),CFrame.new(0,33,38),Color3.fromRGB(205,210,218),aircraft)
 part("VerticalTail",Vector3.new(3,24,13),CFrame.new(0,43,39),Color3.fromRGB(25,75,160),aircraft)
-local seat=Instance.new("VehicleSeat")
+local seat=Instance.new("Seat")
 seat.Name="PilotSeat" seat.Size=Vector3.new(5,2,5) seat.Anchored=true seat.CFrame=CFrame.new(0,34,-26)
 seat.Parent=aircraft
 aircraft.PrimaryPart=fuselage
