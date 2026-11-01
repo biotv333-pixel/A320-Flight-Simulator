@@ -1,0 +1,35 @@
+name: Validate Roblox project
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate project mapping and Luau source
+        run: |
+          python3 - <<'PY'
+          import json, pathlib, sys
+          root = pathlib.Path(".")
+          config = json.loads((root/"default.project.json").read_text())
+          assert config.get("tree",{}).get("$className")=="DataModel"
+          missing=[]
+          def walk(obj):
+              if isinstance(obj,dict):
+                  if "$path" in obj and not (root/obj["$path"]).exists():
+                      missing.append(obj["$path"])
+                  for value in obj.values(): walk(value)
+              elif isinstance(obj,list):
+                  for value in obj: walk(value)
+          walk(config["tree"])
+          if missing: sys.exit("Missing Rojo paths: "+", ".join(missing))
+          scripts=list(root.glob("src/**/*.lua"))+list(root.glob("src/**/*.luau"))
+          assert scripts, "No Luau source files found"
+          print(f"Rojo JSON valid; {len(scripts)} Luau source files found; mapped paths exist.")
+          PY
+      - name: Note validation scope
+        run: echo "Structural validation only; Roblox Studio execution and full Luau typechecking not included."
