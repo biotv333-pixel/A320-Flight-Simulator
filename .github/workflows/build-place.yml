@@ -1,0 +1,26 @@
+name: Build Roblox place in cloud
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rojo CLI
+        run: cargo install rojo --locked
+      - name: Build Roblox place
+        run: |
+          mkdir -p build
+          rojo build default.project.json -o build/A320-Flight-Simulator.rbxlx
+      - name: Upload Roblox place artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: A320-Flight-Simulator-place
+          path: build/A320-Flight-Simulator.rbxlx
+          if-no-files-found: error
