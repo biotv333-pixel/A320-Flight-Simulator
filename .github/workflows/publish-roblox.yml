@@ -14,8 +14,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ROBLOX_API_KEY: ${{ secrets.ROBLOX_OPEN_CLOUD_API_KEY }}
-      ROBLOX_TEST_UNIVERSE_ID: ${{ vars.ROBLOX_TEST_UNIVERSE_ID }}
-      ROBLOX_TEST_PLACE_ID: ${{ vars.ROBLOX_TEST_PLACE_ID }}
+      ROBLOX_TEST_UNIVERSE_ID: "10774182437"
+      ROBLOX_TEST_PLACE_ID: "86173227615947"
     steps:
       - uses: actions/checkout@v4
       - name: Validate isolated test target
