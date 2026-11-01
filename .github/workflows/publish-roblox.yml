@@ -1,0 +1,29 @@
+name: Roblox cloud publishing (manual approval)
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: "Type PUBLISH to enable the release gate"
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  publishing-gate:
+    if: ${{ inputs.confirmation == 'PUBLISH' }}
+    runs-on: ubuntu-latest
+    environment: roblox-production
+    steps:
+      - uses: actions/checkout@v4
+      - name: Publishing prerequisites
+        env:
+          ROBLOX_API_KEY: ${{ secrets.ROBLOX_API_KEY }}
+          ROBLOX_UNIVERSE_ID: ${{ vars.ROBLOX_UNIVERSE_ID }}
+          ROBLOX_PLACE_ID: ${{ vars.ROBLOX_PLACE_ID }}
+        run: |
+          test -n "$ROBLOX_API_KEY" || { echo "Missing ROBLOX_API_KEY secret"; exit 1; }
+          test -n "$ROBLOX_UNIVERSE_ID" || { echo "Missing ROBLOX_UNIVERSE_ID variable"; exit 1; }
+          test -n "$ROBLOX_PLACE_ID" || { echo "Missing ROBLOX_PLACE_ID variable"; exit 1; }
+          echo "Credentials and IDs configured. Publishing intentionally disabled until build pipeline and Roblox Open Cloud upload are implemented and verified."
+      - name: No deployment performed
+        run: echo "This is a gated placeholder, not an active publisher."
