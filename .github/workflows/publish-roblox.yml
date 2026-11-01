@@ -21,6 +21,7 @@ jobs:
       - name: Validate isolated test target
         run: |
           test -n "$ROBLOX_API_KEY" || { echo "Missing Roblox API secret"; exit 1; }
+          test "${#ROBLOX_API_KEY}" -ge 20 || { echo "API key appears too short; check the GitHub secret value"; exit 1; }
           test -n "$ROBLOX_TEST_UNIVERSE_ID" || { echo "Missing ROBLOX_TEST_UNIVERSE_ID"; exit 1; }
           test -n "$ROBLOX_TEST_PLACE_ID" || { echo "Missing ROBLOX_TEST_PLACE_ID"; exit 1; }
           test "$ROBLOX_TEST_UNIVERSE_ID" != "2767957106" || { echo "Production universe blocked"; exit 1; }
@@ -33,6 +34,8 @@ jobs:
           sudo mv rojo /usr/local/bin/rojo
       - name: Build Roblox place
         run: rojo build default.project.json -o game.rbxl
+      - name: Confirm API key secret is present
+        run: echo "Secret present; Roblox will validate its permissions during upload."
       - name: Publish to test place only
         run: |
           curl --fail-with-body --show-error --silent --retry 2 \
