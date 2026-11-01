@@ -39,11 +39,19 @@ local seat=Instance.new("Seat")
 seat.Name="PilotSeat" seat.Size=Vector3.new(5,2,5) seat.Anchored=true seat.CFrame=CFrame.new(0,34,-26)
 seat.Parent=aircraft
 aircraft.PrimaryPart=fuselage
-local pose=CFrame.new(0,30,0)
+local pose=aircraft:GetPivot()
+local spawn=Instance.new("SpawnLocation")
+spawn.Name="PilotSpawn" spawn.Size=Vector3.new(12,1,12)
+spawn.Anchored=true spawn.Neutral=true spawn.CFrame=CFrame.new(0,1,-45)
+spawn.Parent=workspace
 local speed,throttle,pitch,roll=0,0,0,0
 local pilot=nil
+local lastInput={}
 remote.OnServerEvent:Connect(function(player,cmd,value)
  if player~=pilot then return end
+ local now=os.clock()
+ if now-(lastInput[player] or 0)<0.025 then return end
+ lastInput[player]=now
  if typeof(value)~="number" or value~=value then return end
  value=math.clamp(value,-1,1)
  if cmd=="throttle" then throttle=math.clamp(throttle+value*0.04,0,1)
@@ -60,10 +68,13 @@ RunService.Heartbeat:Connect(function(dt)
  speed=math.max(0,speed+(throttle*55-speed*0.04)*dt)
  local airborne=speed>38 or pose.Position.Y>32
  local lift=airborne and (speed*0.035-1.3) or 0
- local dy=math.max(-1,(lift-0.7))*dt*12
+ local dy=math.clamp(lift-0.7,-1,2)*dt*12
  local rotation=CFrame.Angles(pitch*dt*0.28,0,-roll*dt*0.45)
  local nextPose=pose*rotation*CFrame.new(0,dy,-speed*dt)
- if nextPose.Position.Y<8 then nextPose=CFrame.new(nextPose.Position.X,8,nextPose.Position.Z)*nextPose.Rotation speed=speed*0.98 end
+ if nextPose.Position.Y<8 then
+  nextPose=CFrame.new(nextPose.Position.X,8,nextPose.Position.Z)*nextPose.Rotation
+  speed=speed*0.98
+ end
  pose=nextPose
  aircraft:PivotTo(pose)
 end)
